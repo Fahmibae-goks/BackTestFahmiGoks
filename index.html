@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backtest By Fahmi-Goks</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js for Growth Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login & Register Section -->
+    <div id="auth-container" class="container">
+        <div class="auth-card">
+            <h1 class="logo">BACKTEST <span>By Fahmi-Goks</span></h1>
+            <div id="login-form">
+                <h2>Login</h2>
+                <input type="text" id="login-user" placeholder="Username">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button onclick="handleLogin()">Login</button>
+                <p>Don't have an account? <a href="#" onclick="toggleAuth()">Sign Up</a></p>
+            </div>
+            <div id="register-form" style="display: none;">
+                <h2>Sign Up</h2>
+                <input type="text" id="reg-user" placeholder="Username">
+                <input type="password" id="reg-pass" placeholder="Password">
+                <button onclick="handleRegister()">Sign Up</button>
+                <p>Already have an account? <a href="#" onclick="toggleAuth()">Login</a></p>
+            </div>
+            <div class="contact-dev">
+                <a href="https://wa.me/6285117400821" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Laporkan Bug / Hubungi Fahmi
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Section -->
+    <div id="dashboard-container" class="container" style="display: none;">
+        <nav>
+            <h2 class="logo">BACKTEST <span>By Fahmi-Goks</span></h2>
+            <div class="nav-right">
+                <span id="display-user"></span>
+                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+        </nav>
+
+        <main>
+            <!-- Stats Overview -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Initial Balance</h3>
+                    <div class="balance-input-group">
+                        <select id="currency-select" onchange="updateUI()">
+                            <option value="$">$ (USD)</option>
+                            <option value="Rp">Rp (IDR)</option>
+                            <option value="€">€ (EUR)</option>
+                            <option value="£">£ (GBP)</option>
+                            <option value="¥">¥ (JPY)</option>
+                        </select>
+                        <input type="number" id="input-initial-balance" value="0" onchange="updateInitialBalance()">
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Current Balance</h3>
+                    <p id="stat-current">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Win Rate</h3>
+                    <p id="stat-winrate">0%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Trades</h3>
+                    <p id="stat-total">0</p>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="chart-section">
+                <canvas id="equityChart"></canvas>
+            </section>
+
+            <!-- Input Form Section -->
+            <section class="input-section">
+                <div class="card">
+                    <h3>Add New Trade</h3>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Pair</label>
+                            <input list="pairs" id="input-pair" placeholder="e.g. XAUUSD">
+                            <datalist id="pairs">
+                                <option value="XAUUSD">
+                                <option value="BTCUSD">
+                                <option value="AUDJPY">
+                                <option value="EURUSD">
+                                <option value="GBPUSD">
+                            </datalist>
+                        </div>
+                        <div class="input-group">
+                            <label>Strategy</label>
+                            <input type="text" id="input-strategy" placeholder="Strategy Name">
+                        </div>
+                        <div class="input-group">
+                            <label>Type</label>
+                            <select id="input-type">
+                                <option value="Profit">Profit</option>
+                                <option value="Loss">Loss</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Amount</label>
+                            <input type="number" id="input-amount" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Date & Time</label>
+                            <input type="datetime-local" id="input-datetime">
+                        </div>
+                        <div class="input-group">
+                            <label>Screenshot</label>
+                            <input type="file" id="input-ss-file" accept="image/*" class="file-input">
+                        </div>
+                    </div>
+                    <div class="input-group full-width">
+                        <label>Notes / Evaluation</label>
+                        <textarea id="input-notes" rows="3" placeholder="Daily evaluation..."></textarea>
+                    </div>
+                    <button class="btn-primary" onclick="addTrade()">Save Trade</button>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="history-section">
+                <div class="card">
+                    <div class="header-flex">
+                        <h3>Trade History</h3>
+                        <button class="btn-success" onclick="exportToExcel()">Download Excel</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="trade-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Pair</th>
+                                    <th>Strategy</th>
+                                    <th>Result</th>
+                                    <th>Amount</th>
+                                    <th>Notes</th>
+                                    <th>SS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trade-body">
+                                <!-- Data injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer-contact">
+                <p>&copy; 2024 Backtest By Fahmi-Goks | <a href="https://wa.me/6285117400821" target="_blank"><i class="fab fa-whatsapp"></i> Contact Developer</a></p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
